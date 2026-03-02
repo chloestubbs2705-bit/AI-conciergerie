@@ -3,205 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conciergerie IA - Dashboard</title>
+    <title>Conciergerie IA Pro</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary: #6366f1;
-            --success: #22c55e;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --bg: #f8fafc;
-            --card: #ffffff;
-            --text: #1e293b;
+            --primary: #6366f1; --success: #22c55e; --warning: #f59e0b; --danger: #ef4444;
+            --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --muted: #64748b;
+        }
+        .dark-mode {
+            --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --muted: #94a3b8;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 20px; }
-
-        header {
-            background: var(--primary);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: background 0.3s; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 30px; }
+        
+        header { 
+            background: var(--primary); color: white; padding: 15px; 
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         .container { max-width: 600px; margin: 0 auto; padding: 15px; }
 
-        .stats-bar {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            gap: 10px;
+        /* Badges d'état */
+        .status-pill { font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; font-weight: bold; text-transform: uppercase; }
+        .check-in { background: #dcfce7; color: #166534; }
+        .check-out { background: #fee2e2; color: #991b1b; }
+
+        /* Cartes */
+        .card { 
+            background: var(--card); border-radius: 16px; padding: 20px; margin-bottom: 15px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); position: relative;
         }
-
-        .stat-item {
-            background: var(--card);
-            flex: 1;
-            padding: 10px;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        .stat-item span { display: block; font-size: 1.2rem; font-weight: bold; color: var(--primary); }
-
-        /* Style des Cartes de Demandes */
-        .card {
-            background: var(--card);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-            border-left: 5px solid var(--warning);
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-        .platform-badge { font-size: 0.75rem; padding: 4px 8px; border-radius: 20px; background: #fee2e2; color: #991b1b; font-weight: bold; }
+        .client-name { font-size: 1.1rem; font-weight: bold; }
+        .msg-box { background: rgba(0,0,0,0.03); padding: 12px; border-radius: 8px; margin: 10px 0; border-left: 3px solid var(--primary); }
         
-        .client-msg { font-style: italic; background: #f1f5f9; padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 0.95rem; }
-        
-        .action-preview {
-            background: #e0e7ff;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px dashed var(--primary);
-            margin-top: 15px;
+        /* Actions */
+        .button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .btn { 
+            border: none; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
+        .btn-val { background: var(--success); color: white; grid-column: span 2; }
+        .btn-wa { background: #25D366; color: white; }
+        .btn-mod { background: var(--warning); color: white; }
 
-        .action-preview h4 { color: var(--primary); font-size: 0.9rem; margin-bottom: 5px; }
-
-        /* Boutons d'Action */
-        .button-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-            margin-top: 20px;
+        /* Modal de modification */
+        #modal {
+            display: none; position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;
         }
-
-        .btn {
-            border: none;
-            padding: 12px 5px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            font-size: 0.8rem;
-            transition: transform 0.1s;
-        }
-
-        .btn:active { transform: scale(0.95); }
-        .btn-validate { background: var(--success); color: white; }
-        .btn-modify { background: var(--warning); color: white; }
-        .btn-refuse { background: var(--danger); color: white; }
-
-        .empty-state { text-align: center; padding: 50px 20px; color: #94a3b8; }
+        .modal-content { background: var(--card); padding: 20px; border-radius: 15px; width: 90%; max-width: 400px; }
+        textarea { width: 100%; height: 100px; margin: 10px 0; padding: 10px; border-radius: 8px; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>Conciergerie IA</h1>
-    <p>Validation des Actions</p>
+    <div><strong>Conciergerie IA</strong></div>
+    <button onclick="document.body.classList.toggle('dark-mode')" style="background:none; border:none; color:white; font-size:1.2rem;">
+        <i class="fas fa-moon"></i>
+    </button>
 </header>
 
-<div class="container">
-    <div class="stats-bar">
-        <div class="stat-item"><span>3</span>À valider</div>
-        <div class="stat-item"><span>12</span>Aujourd'hui</div>
-        <div class="stat-item"><span>2</span>Ménages</div>
+<div class="container" id="app">
     </div>
 
-    <div id="requests-container">
-        </div>
+<div id="modal">
+    <div class="modal-content">
+        <h3>Modifier la réponse</h3>
+        <textarea id="edit-text"></textarea>
+        <button class="btn btn-val" onclick="saveEdit()">Enregistrer & Valider</button>
+        <button class="btn" style="width:100%; margin-top:5px;" onclick="closeModal()">Annuler</button>
+    </div>
 </div>
 
 <script>
-    // Simulation des données reçues par l'IA (en attente de ton API Guesthy)
-    const pendingActions = [
+    let currentEditId = null;
+    const actions = [
         {
-            id: 1,
-            client: "Jean Dupont",
-            logement: "Appartement Vue Mer - Cannes",
-            plateforme: "Airbnb",
-            message: "Bonjour, on arrive à 14h, est-il possible d'avoir un lit bébé ?",
-            suggestion: "Envoyer WhatsApp Ménage : 'Prévoir lit bébé pour 14h'."
+            id: 1, client: "Jean Dupont", logement: "Villa Cannes", type: "check-in",
+            msg: "On arrive à 14h, lit bébé possible ?", 
+            suggest: "Bonjour Jean, c'est noté pour 14h. Je demande à l'équipe d'installer le lit bébé.",
+            phone: "33612345678" // Numéro de la femme de ménage
         },
         {
-            id: 2,
-            client: "Maria Silva",
-            logement: "Studio Centre-Ville",
-            plateforme: "Booking.com",
-            message: "Pouvez-vous nous recommander un bon restaurant japonais ?",
-            suggestion: "Répondre : 'Recommander le Sushi Bar (Préféré de la cliente)'."
+            id: 2, client: "Lucas Martin", logement: "Studio Centre", type: "check-out",
+            msg: "On part à 10h, merci !", 
+            suggest: "Ménage requis à 10h pour le Studio Centre. Merci !",
+            phone: "33698765432"
         }
     ];
 
-    function renderActions() {
-        const container = document.getElementById('requests-container');
-        container.innerHTML = '';
-
-        if (pendingActions.length === 0) {
-            container.innerHTML = '<div class="empty-state"><i class="fas fa-check-circle fa-3x"></i><p><br>Toutes les actions sont traitées !</p></div>';
-            return;
-        }
-
-        pendingActions.forEach(action => {
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-                <div class="card-header">
-                    <div>
-                        <strong>${action.client}</strong><br>
-                        <small style="color: #64748b">${action.logement}</small>
-                    </div>
-                    <span class="platform-badge">${action.plateforme}</span>
+    function render() {
+        const container = document.getElementById('app');
+        container.innerHTML = actions.map(a => `
+            <div class="card" id="card-${a.id}">
+                <div style="display:flex; justify-content:space-between">
+                    <span class="status-pill ${a.type}">${a.type}</span>
+                    <small style="color:var(--muted)">${a.logement}</small>
                 </div>
-                <div class="client-msg">"${action.message}"</div>
-                <div class="action-preview">
-                    <h4><i class="fas fa-robot"></i> Suggestion IA :</h4>
-                    <p>${action.suggestion}</p>
+                <div class="client-name" style="margin-top:10px">${a.client}</div>
+                <div class="msg-box">${a.msg}</div>
+                <div style="font-size:0.9rem; color:var(--primary)"><strong>IA :</strong> ${a.suggest}</div>
+                
+                <div class="button-grid">
+                    <button class="btn btn-val" onclick="validate(${a.id})"><i class="fas fa-check"></i> Valider l'action</button>
+                    <button class="btn btn-wa" onclick="sendWA('${a.phone}', '${a.suggest}')"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                    <button class="btn btn-mod" onclick="openModal(${a.id}, '${a.suggest}')"><i class="fas fa-edit"></i> Modifier</button>
                 </div>
-                <div class="button-group">
-                    <button class="btn btn-validate" onclick="handleAction(${action.id}, 'valider')">
-                        <i class="fas fa-check"></i> Valider
-                    </button>
-                    <button class="btn btn-modify" onclick="handleAction(${action.id}, 'modifier')">
-                        <i class="fas fa-edit"></i> Modifier
-                    </button>
-                    <button class="btn btn-refuse" onclick="handleAction(${action.id}, 'refuser')">
-                        <i class="fas fa-times"></i> Refuser
-                    </button>
-                </div>
-            `;
-            container.appendChild(card);
-        });
+            </div>
+        `).join('');
     }
 
-    function handleAction(id, type) {
-        // Logique simplifiée pour la démo
-        const index = pendingActions.findIndex(a => a.id === id);
-        if (index > -1) {
-            alert(`Action ${type}e avec succès !`);
-            pendingActions.splice(index, 1);
-            renderActions();
-            // Ici, on ajouterait l'appel vers ton backend (Python)
-        }
+    function sendWA(phone, text) {
+        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
     }
 
-    // Lancement au chargement
-    renderActions();
+    function openModal(id, text) {
+        currentEditId = id;
+        document.getElementById('edit-text').value = text;
+        document.getElementById('modal').style.display = 'flex';
+    }
+
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+    function saveEdit() {
+        const newText = document.getElementById('edit-text').value;
+        const action = actions.find(a => a.id === currentEditId);
+        action.suggest = newText;
+        validate(currentEditId);
+        closeModal();
+    }
+
+    function validate(id) {
+        document.getElementById(`card-${id}`).style.transform = "translateX(100%)";
+        document.getElementById(`card-${id}`).style.opacity = "0";
+        setTimeout(() => {
+            const idx = actions.findIndex(a => a.id === id);
+            actions.splice(idx, 1);
+            render();
+        }, 300);
+    }
+
+    render();
 </script>
-
 </body>
 </html>
