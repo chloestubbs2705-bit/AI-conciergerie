@@ -3,136 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conciergerie IA - Gestion Agenda</title>
+    <title>Conciergerie IA - Système Expert</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
             --primary: #6366f1; --success: #22c55e; --warning: #f59e0b; --danger: #ef4444;
-            --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --muted: #64748b; --calendar: #475569;
+            --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --muted: #64748b; --vip: #8b5cf6;
         }
         .dark-mode { --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --muted: #94a3b8; }
 
         * { box-sizing: border-box; margin: 0; padding: 0; transition: all 0.2s; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 30px; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 50px; }
         
         header { background: var(--primary); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        
+        .stock-banner { background: #1e293b; color: #fbbf24; font-size: 0.75rem; padding: 5px 15px; display: flex; justify-content: space-around; }
 
-        .search-container { background: var(--card); padding: 10px 15px; border-bottom: 1px solid #ddd; }
-        .search-bar { width: 100%; padding: 12px; border-radius: 25px; border: 1px solid #ddd; background: var(--bg); color: var(--text); }
-
-        .nav-tabs { display: flex; background: var(--card); border-bottom: 1px solid #ddd; position: sticky; top: 55px; z-index: 90; }
-        .tab { flex: 1; text-align: center; padding: 12px 5px; cursor: pointer; font-size: 0.75rem; font-weight: 600; color: var(--muted); border-bottom: 3px solid transparent; }
+        .nav-tabs { display: flex; background: var(--card); border-bottom: 1px solid #ddd; position: sticky; top: 55px; z-index: 90; overflow-x: auto; }
+        .tab { flex: 1; min-width: 80px; text-align: center; padding: 12px 5px; cursor: pointer; font-size: 0.7rem; font-weight: 600; color: var(--muted); border-bottom: 3px solid transparent; }
         .tab.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
 
         .container { max-width: 600px; margin: 0 auto; padding: 15px; }
 
-        .card { 
-            background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 15px;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-left: 6px solid var(--primary);
-        }
-
-        .memory-badge { background: #fef3c7; color: #92400e; padding: 10px; border-radius: 12px; font-size: 0.85rem; margin-top: 10px; border: 1px dashed #f59e0b; display: flex; align-items: center; gap: 8px; }
-
-        .status-pill { font-size: 0.65rem; padding: 4px 10px; border-radius: 20px; font-weight: bold; text-transform: uppercase; }
-        .check-in { background: #dcfce7; color: #166534; }
-        .check-out { background: #fee2e2; color: #991b1b; }
-
-        .msg-box { background: rgba(0,0,0,0.03); padding: 12px; border-radius: 8px; margin: 12px 0; border-left: 3px solid #cbd5e1; font-style: italic; font-size: 0.9rem; }
+        .card { background: var(--card); border-radius: 20px; padding: 18px; margin-bottom: 15px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); position: relative; border: 1px solid rgba(0,0,0,0.05); }
         
-        /* Grille de boutons mise à jour pour l'Agenda */
-        .button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
-        .btn { border: none; padding: 10px 5px; border-radius: 12px; font-weight: 600; cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; gap: 5px; }
+        /* Alertes Spéciales */
+        .alert-timing { background: #fee2e2; color: #991b1b; padding: 10px; border-radius: 12px; margin-bottom: 10px; font-size: 0.8rem; border: 1px solid #fecaca; display: flex; justify-content: space-between; align-items: center; }
+        .lang-badge { font-size: 0.65rem; background: #e0e7ff; color: var(--primary); padding: 2px 6px; border-radius: 4px; margin-left: 5px; }
         
-        .btn-val { background: var(--success); color: white; grid-column: span 2; flex-direction: row; justify-content: center; font-size: 0.95rem; }
+        .msg-box { background: rgba(0,0,0,0.03); padding: 12px; border-radius: 8px; margin: 10px 0; font-size: 0.9rem; position: relative; }
+        .translation { font-size: 0.8rem; color: var(--muted); margin-top: 5px; border-top: 1px solid #eee; padding-top: 5px; }
+
+        /* Grille de Boutons Optimisée */
+        .button-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 15px; }
+        .btn { border: none; padding: 10px 2px; border-radius: 10px; font-weight: 600; cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 0.65rem; gap: 4px; }
+        
+        .btn-val { background: var(--success); color: white; grid-column: span 3; flex-direction: row; justify-content: center; font-size: 0.9rem; padding: 12px; }
         .btn-wa { background: #25D366; color: white; }
-        .btn-call { background: #3b82f6; color: white; }
-        .btn-cal { background: var(--calendar); color: white; }
-        .btn-mod { background: var(--warning); color: white; }
+        .btn-pay { background: #6366f1; color: white; } /* Upselling */
+        .btn-rev { background: #f59e0b; color: white; } /* Review */
+        .btn-mod { background: #94a3b8; color: white; }
+        .btn-urgent { background: var(--danger); color: white; padding: 5px 10px; flex-direction: row; font-size: 0.7rem; }
 
         #modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
         .modal-content { background: var(--card); padding: 25px; border-radius: 20px; width: 90%; max-width: 400px; }
-        textarea { width: 100%; height: 120px; margin: 15px 0; padding: 12px; border-radius: 12px; border: 1px solid #ddd; font-family: inherit; }
     </style>
 </head>
 <body>
 
 <header>
-    <div><i class="fas fa-robot"></i> <strong>Concierge IA Pro</strong></div>
-    <button onclick="document.body.classList.toggle('dark-mode')" style="background:none; border:none; color:white;"><i class="fas fa-adjust"></i></button>
+    <div><i class="fas fa-crown"></i> <strong>MyConcierge Elite</strong></div>
+    <button onclick="document.body.classList.toggle('dark-mode')" style="background:none; border:none; color:white;"><i class="fas fa-moon"></i></button>
 </header>
 
-<div class="search-container">
-    <input type="text" class="search-bar" placeholder="Chercher client ou appartement..." onkeyup="filterSearch(this.value)">
+<div class="stock-banner">
+    <span><i class="fas fa-coffee"></i> Café: 12</span>
+    <span><i class="fas fa-soap"></i> Kits: 8</span>
+    <span><i class="fas fa-bed"></i> Draps: 24</span>
 </div>
 
 <div class="nav-tabs">
-    <div class="tab active" onclick="switchTab('all', this)"><i class="fas fa-border-all"></i> Tout</div>
-    <div class="tab" onclick="switchTab('Airbnb', this)"><i class="fab fa-airbnb"></i> Airbnb</div>
-    <div class="tab" onclick="switchTab('Booking.com', this)"><i class="fas fa-bed"></i> Booking</div>
-    <div class="tab" onclick="switchTab('WhatsApp', this)"><i class="fab fa-whatsapp"></i> Direct</div>
+    <div class="tab active" onclick="switchTab('all', this)"><i class="fas fa-list"></i><br>Flux</div>
+    <div class="tab" onclick="switchTab('Airbnb', this)"><i class="fab fa-airbnb"></i><br>Airbnb</div>
+    <div class="tab" onclick="switchTab('Booking.com', this)"><i class="fas fa-bed"></i><br>Booking</div>
+    <div class="tab" onclick="switchTab('WhatsApp', this)"><i class="fab fa-whatsapp"></i><br>Direct</div>
 </div>
 
 <div class="container" id="app"></div>
 
-<div id="modal">
-    <div class="modal-content">
-        <h3><i class="fas fa-pen"></i> Modifier</h3>
-        <textarea id="edit-text"></textarea>
-        <button class="btn btn-val" onclick="saveEdit()">Confirmer</button>
-        <button class="btn" style="width:100%; background:none; color:var(--muted)" onclick="closeModal()">Annuler</button>
-    </div>
-</div>
-
 <script>
     let currentTab = 'all';
-    let searchQuery = '';
-    let currentEditId = null;
-
+    
+    // Données enrichies avec les nouvelles fonctionnalités
     const actions = [
-        { id: 1, client: "Mme X", logement: "Villa Vue Mer", source: "Airbnb", type: "check-in", msg: "On arrive à 14h, lit bébé possible ?", suggest: "Prévoir lit bébé pour 14h.", phone: "33612345678", memory: "Aime le vin blanc." },
-        { id: 2, client: "Problème Tech", logement: "Studio Centre", source: "WhatsApp", type: "Urgence", msg: "La clim ne marche plus !", suggest: "L'IA ne peut pas réparer la clim. Prends RDV avec le technicien.", phone: "33600000000", memory: null }
+        { 
+            id: 1, client: "Hans Müller", log: "Villa Cannes", source: "Booking.com", type: "check-in", 
+            lang: "Allemand", msg: "Können wir um 13 Uhr einchecken?", trans: "Pouvons-nous arriver à 13h ?",
+            suggest: "Accorder l'arrivée anticipée (Ménage fini).", phone: "33612345678", 
+            conflict: "Sortie précédente à 11h (Timing serré)", payLink: false
+        },
+        { 
+            id: 2, client: "John S.", log: "Studio Nice", source: "Airbnb", type: "upsell", 
+            lang: "Anglais", msg: "Do you have champagne?", trans: "Avez-vous du champagne ?",
+            suggest: "Proposer Pack Romance (Champagne + Fleurs) pour 45€.", phone: "33600000000", 
+            conflict: null, payLink: "https://buy.stripe.com/test"
+        },
+        { 
+            id: 3, client: "Julie L.", log: "Penthouse", source: "WhatsApp", type: "check-out", 
+            lang: "Français", msg: "C'était super, merci !", trans: null,
+            suggest: "Envoyer lien de review 5 étoiles.", phone: "33611223344", 
+            conflict: null, payLink: false, review: true
+        }
     ];
 
     function render() {
         const container = document.getElementById('app');
-        const filtered = actions.filter(a => (currentTab === 'all' || a.source === currentTab) && (a.client.toLowerCase().includes(searchQuery) || a.logement.toLowerCase().includes(searchQuery)));
+        const filtered = actions.filter(a => currentTab === 'all' || a.source === currentTab);
         
         container.innerHTML = filtered.map(a => `
-            <div class="card" id="card-${a.id}">
+            <div class="card">
+                ${a.conflict ? `
+                    <div class="alert-timing">
+                        <span><i class="fas fa-clock"></i> ${a.conflict}</span>
+                        <button class="btn btn-urgent" onclick="sendWA('${a.phone}', 'Urgence timing ${a.log} : Client arrive à 13h !')">Alerter Ménage</button>
+                    </div>
+                ` : ''}
+
                 <div style="display:flex; justify-content:space-between">
-                    <span class="status-pill ${a.type}">${a.type}</span>
-                    <small style="color:var(--primary)">${a.source}</small>
+                    <span class="status-pill">${a.type}</span>
+                    <small style="color:var(--primary)">${a.source} ${a.lang ? `<span class="lang-badge">${a.lang}</span>` : ''}</small>
                 </div>
-                <div style="margin-top:10px;"><strong>${a.client}</strong> - ${a.logement}</div>
-                <div class="msg-box">"${a.msg}"</div>
-                <div style="font-size:0.9rem; color:var(--primary); background: #f0f7ff; padding:8px; border-radius:8px;"><i class="fas fa-robot"></i> ${a.suggest}</div>
+
+                <div style="margin-top:10px;"><strong>${a.client}</strong> • <small>${a.log}</small></div>
+                
+                <div class="msg-box">
+                    "${a.msg}"
+                    ${a.trans ? `<div class="translation"><i class="fas fa-language"></i> Traduction : ${a.trans}</div>` : ''}
+                </div>
+
+                <div style="font-size:0.85rem; color:var(--primary); background: #f0f7ff; padding:10px; border-radius:10px;">
+                    <i class="fas fa-robot"></i> ${a.suggest}
+                </div>
 
                 <div class="button-grid">
-                    <button class="btn btn-val" onclick="validate(${a.id})"><i class="fas fa-check-circle"></i> VALIDER</button>
+                    <button class="btn btn-val" onclick="validate(${a.id})"><i class="fas fa-check-circle"></i> VALIDER & MISE À JOUR STOCK</button>
+                    
                     <button class="btn btn-wa" onclick="sendWA('${a.phone}', '${a.suggest}')"><i class="fab fa-whatsapp"></i> WhatsApp</button>
-                    <button class="btn btn-cal" onclick="addToCalendar('${a.client}', '${a.logement}', '${a.msg}')"><i class="fas fa-calendar-plus"></i> Agenda</button>
-                    <button class="btn btn-call" onclick="window.open('tel:${a.phone}')"><i class="fas fa-phone"></i> Appeler</button>
-                    <button class="btn btn-mod" onclick="openModal(${a.id}, '${a.suggest}')"><i class="fas fa-edit"></i> Modifier</button>
+                    
+                    ${a.payLink ? `<button class="btn btn-pay" onclick="window.open('${a.payLink}')"><i class="fas fa-credit-card"></i> Paiement</button>` : `<button class="btn btn-mod"><i class="fas fa-edit"></i> Modifier</button>`}
+                    
+                    ${a.review ? `<button class="btn btn-rev" onclick="sendWA('${a.phone}', 'Merci Julie ! Pouvez-vous nous noter 5* ici : lien.com ?')"><i class="fas fa-star"></i> Relance Note</button>` : `<button class="btn btn-mod" onclick="window.open('tel:${a.phone}')"><i class="fas fa-phone"></i> Appeler</button>`}
                 </div>
             </div>
         `).join('');
     }
 
-    function addToCalendar(client, log, msg) {
-        const title = encodeURIComponent(`Action Concierge : ${client} (${log})`);
-        const details = encodeURIComponent(`Message client : ${msg}`);
-        // Lien vers Google Calendar
-        const url = `https://www.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}`;
-        window.open(url, '_blank');
+    function sendWA(p, t) { window.open(`https://wa.me/${p}?text=${encodeURIComponent(t)}`, '_blank'); }
+    
+    function validate(id) {
+        alert("Action validée ! Stock déduit : -1 Kit, -2 Café.");
+        const idx = actions.findIndex(x => x.id === id);
+        actions.splice(idx, 1);
+        render();
     }
 
-    function filterSearch(val) { searchQuery = val.toLowerCase(); render(); }
-    function switchTab(s, e) { currentTab = s; document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); e.classList.add('active'); render(); }
-    function sendWA(p, t) { window.open(`https://wa.me/${p}?text=${encodeURIComponent(t)}`, '_blank'); }
-    function openModal(id, text) { currentEditId = id; document.getElementById('edit-text').value = text; document.getElementById('modal').style.display = 'flex'; }
-    function closeModal() { document.getElementById('modal').style.display = 'none'; }
-    function saveEdit() { const a = actions.find(x => x.id === currentEditId); a.suggest = document.getElementById('edit-text').value; validate(currentEditId); closeModal(); }
-    function validate(id) { const el = document.getElementById(`card-${id}`); el.style.opacity = "0"; setTimeout(() => { actions.splice(actions.findIndex(x => x.id === id), 1); render(); }, 300); }
+    function switchTab(s, e) {
+        currentTab = s;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        e.classList.add('active');
+        render();
+    }
 
     render();
 </script>
