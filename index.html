@@ -18,20 +18,24 @@
         * { box-sizing: border-box; margin: 0; padding: 0; transition: all 0.2s; }
         body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
         
+        /* Sidebar */
         .sidebar { width: 250px; background: var(--sidebar); color: var(--sidebar-text); padding: 20px; display: flex; flex-direction: column; }
         .sidebar h2 { font-size: 1.1rem; margin-bottom: 30px; color: #f1c40f; text-transform: uppercase; letter-spacing: 1px;}
         .nav-item { padding: 12px; cursor: pointer; border-radius: 8px; color: #bdc3c7; font-size: 0.9rem; margin-bottom: 5px; }
         .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); color: white; }
         .nav-item i { margin-right: 10px; }
 
+        /* Main Content */
         .main-content { flex: 1; padding: 30px; }
         header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         
+        /* KPI Cards */
         .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .kpi-card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid var(--primary); }
         .kpi-title { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; }
         .kpi-value { font-size: 1.4rem; font-weight: bold; color: var(--text); }
 
+        /* Actions Grid */
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
         .card { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 4px solid var(--primary); position: relative;}
         
@@ -39,7 +43,9 @@
         .client-info { display: flex; align-items: center; gap: 10px; }
         .client-avatar { width: 45px; height: 45px; background: #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--primary); }
         
-        .alert-badge { background: var(--danger); color: white; padding: 5px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; position: absolute; top: 10px; right: 10px;}
+        .alert-badge { background: var(--danger); color: white; padding: 5px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; position: absolute; top: 10px; right: 10px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
         .msg-box { background: rgba(0,0,0,0.03); padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 0.85rem; font-style: italic; }
         .suggest-box { font-size: 0.85rem; color: var(--text); background: rgba(0,0,0,0.05); padding: 10px; border-radius: 6px; font-weight: bold; margin-bottom: 10px; }
 
@@ -47,13 +53,20 @@
         .btn { border: none; padding: 10px; border-radius: 6px; font-weight: 600; cursor: pointer; text-align: center; font-size: 0.75rem; }
         .btn-val { background: var(--success); color: white; grid-column: span 3; font-size: 0.9rem; }
         .btn-wa { background: #27ae60; color: white; }
-        .btn-vtc { background: #34495e; color: white; }
+        .btn-pay { background: var(--primary); color: white; }
+        .btn-review { background: var(--warning); color: white; }
+        .btn-cleaning { background: #8e44ad; color: white; }
         .btn-voice { background: #e74c3c; color: white; }
+        .btn-vtc { background: #34495e; color: white; }
 
+        /* Tables & Map */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; background: var(--card); border-radius: 8px; overflow: hidden; }
         th, td { text-align: left; padding: 15px; border-bottom: 1px solid #eee; }
         th { background: rgba(0,0,0,0.05); color: var(--muted); font-size: 0.8rem; text-transform: uppercase; }
         
+        .map-box { height: 350px; background: #d7eafb; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #3498db; font-weight: bold; margin-bottom: 20px; border: 2px dashed #3498db; position: relative;}
+        .map-pin { position: absolute; font-size: 1.2rem; cursor: pointer; }
+
         .page-content { display: none; }
         .page-content.active { display: block; }
     </style>
@@ -63,7 +76,10 @@
 <div class="sidebar">
     <h2><i class="fas fa-crown"></i> Concierge Elite</h2>
     <div class="nav-item active" onclick="switchPage('dashboard', this)"><i class="fas fa-tasks"></i> Flux Demandes</div>
+    <div class="nav-item" onclick="switchPage('biens', this)"><i class="fas fa-map-marked-alt"></i> Carte & Biens</div>
+    <div class="nav-item" onclick="switchPage('planning', this)"><i class="fas fa-calendar-alt"></i> Planning</div>
     <div class="nav-item" onclick="switchPage('maintenance', this)"><i class="fas fa-tools"></i> Maintenance</div>
+    <div class="nav-item" onclick="switchPage('stocks', this)"><i class="fas fa-boxes"></i> Stocks</div>
     <div class="nav-item" onclick="switchPage('finances', this)"><i class="fas fa-file-invoice-dollar"></i> Finances</div>
     <div class="nav-item" onclick="toggleDarkMode()"><i class="fas fa-moon"></i> Mode Nuit</div>
 </div>
@@ -74,7 +90,40 @@
     </header>
 
     <div id="dashboard" class="page-content active">
+        <div class="kpi-grid">
+            <div class="kpi-card"><div class="kpi-title">CA Estimé (Mois)</div><div class="kpi-value">28 500 €</div></div>
+            <div class="kpi-card"><div class="kpi-title">Taux d'Occupation</div><div class="kpi-value">92%</div></div>
+            <div class="kpi-card" id="stock-kpi"><div class="kpi-title">Alertes Stock</div><div class="kpi-value" style="color:var(--danger)">Café / Kits</div></div>
+        </div>
         <div class="grid-container" id="app"></div>
+    </div>
+
+    <div id="biens" class="page-content">
+        <div class="map-box">
+            <i class="fas fa-map-marker-alt fa-2x"></i>&nbsp; Carte Interactive Luxe
+            <span class="map-pin" style="top:20%; left:30%; color:var(--success)" title="Villa Azure - Dispo">📍</span>
+            <span class="map-pin" style="top:40%; left:50%; color:var(--danger)" title="Penthouse - Occupé">📍</span>
+        </div>
+        <div class="card">
+            <h3>Liste des 15 Biens de Luxe</h3>
+            <table id="biens-table">
+                <thead><tr><th>Nom</th><th>Adresse</th><th>Statut</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="planning" class="page-content">
+        <div class="card">
+            <h3>Planning Hebdomadaire</h3>
+            <table>
+                <thead><tr><th>Bien</th><th>Client</th><th>Check-in</th><th>Check-out</th></tr></thead>
+                <tbody>
+                    <tr><td>Villa Azure</td><td>H. Müller</td><td>02/03</td><td>09/03</td></tr>
+                    <tr><td>Penthouse</td><td>S. Lee</td><td>01/03</td><td>05/03</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <div id="maintenance" class="page-content">
@@ -83,34 +132,67 @@
             <table>
                 <thead><tr><th>Bien</th><th>Problème</th><th>Photo</th><th>Statut</th></tr></thead>
                 <tbody>
-                    <tr><td>Villa Azure</td><td>Fuite d'eau SDB</td><td><i class="fas fa-image"></i></td><td style="color:var(--danger)">En cours</td></tr>
-                    <tr><td>Studio Palais</td><td>Ampoule grillée</td><td>-</td><td style="color:var(--warning)">En attente</td></tr>
+                    <tr><td>Villa Azure</td><td>Fuite eau</td><td><i class="fas fa-image"></i></td><td style="color:var(--danger)">Urgent</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
+    <div id="stocks" class="page-content">
+        <div class="card">
+            <h3>Inventaire de Courtoisie</h3>
+            <table>
+                <thead><tr><th>Article</th><th>Quantité</th><th>Seuil</th></tr></thead>
+                <tbody>
+                    <tr><td>Café</td><td style="color:var(--danger)" id="stock-cafe">20</td><td>100</td></tr>
+                    <tr><td>Kits</td><td style="color:var(--danger)" id="stock-kits">4</td><td>15</td></tr>
+                </tbody>
+            </table>
+            <button class="btn btn-pay" style="margin-top:15px;" onclick="alert('Commande Amazon envoyée !')">Commander Amazon</button>
+        </div>
+    </div>
+
     <div id="finances" class="page-content">
-        <div class="kpi-card">
-            <h3>Rapport Financier - Février 2026</h3>
-            <p style="margin: 15px 0; color:var(--muted)">Revenus : 28 500 € | Frais Ménage : 4 200 €</p>
-            <button class="btn btn-vtc" onclick="alert('PDF généré et envoyé au propriétaire !')">Générer Rapport PDF</button>
+        <div class="card">
+            <h3>Reporting Financier</h3>
+            <p style="margin: 15px 0;">Génération de PDF propriétaires.</p>
+            <button class="btn btn-vtc" onclick="alert('PDF généré !')">Générer Rapport PDF</button>
         </div>
     </div>
 </div>
 
 <script>
-    // 1. Données des demandes (avec Analyseur de Sentiment IA)
-    const actions = [
-        { id: 1, client: "H. Müller", log: "Villa Azure", sentiment: "normal", msg: "Arrivée 13h ?", phone: "33612345678", suggest: "Ok 13h." },
-        { id: 2, client: "Client Fâché", log: "Penthouse", sentiment: "colère", msg: "La clim est en panne, c'est inacceptable !", phone: "33600000000", suggest: "⚠️ Réparation urgence + VTC offert." }
+    // 1. Données
+    const biens = [
+        { nom: "Villa Azure", addr: "Cannes", dispo: true }, { nom: "Penthouse", addr: "Cannes", dispo: false },
+        { nom: "Villa Azure", addr: "Cannes", dispo: true }, { nom: "Penthouse", addr: "Cannes", dispo: false },
+        { nom: "Villa Azure", addr: "Cannes", dispo: true }, { nom: "Penthouse", addr: "Cannes", dispo: false },
+        { nom: "Villa Azure", addr: "Cannes", dispo: true }, { nom: "Penthouse", addr: "Cannes", dispo: false },
+        { nom: "Villa Azure", addr: "Cannes", dispo: true }, { nom: "Penthouse", addr: "Cannes", dispo: false },
+        { nom: "Villa Azure", addr: "Cannes", dispo: true }, { nom: "Penthouse", addr: "Cannes", dispo: false },
+        { nom: "Villa Azure", addr: "Cannes", dispo: true }, { nom: "Penthouse", addr: "Cannes", dispo: false },
+        { nom: "Villa Azure", addr: "Cannes", dispo: true }
     ];
+    let stock = { cafe: 20, kits: 4 };
+    
+    // Analyseur de Sentiment & Fonctionnalités IA
+    const actions = [
+        { id: 1, client: "H. Müller", log: "Villa Azure", sentiment: "normal", msg: "Arrivée 13h ? Précédent part 11h.", phone: "33612345678", suggest: "⚠️ Timing Serré !", urgent: true, review: false, upsell: false },
+        { id: 2, client: "S. Lee", log: "Penthouse", sentiment: "colère", msg: "La clim est en panne, c'est inacceptable !", phone: "33600000000", suggest: "⚠️ Réparation urgence + VTC.", urgent: true, review: false, upsell: false },
+        { id: 3, client: "M. Dubois", log: "Apartment", sentiment: "normal", msg: "C'était superbe !", phone: "33611223344", suggest: "Relancer review.", urgent: false, review: true, upsell: false }
+    ];
+
+    // 2. Fonctions
+    function renderBiens() {
+        const tbody = document.querySelector('#biens-table tbody');
+        tbody.innerHTML = biens.map(b => `<tr><td><strong>${b.nom}</strong></td><td>${b.addr}</td><td><span style="color:${b.dispo ? 'var(--success)' : 'var(--danger)'}">${b.dispo ? 'Dispo' : 'Occupé'}</span></td></tr>`).join('');
+    }
 
     function renderDemandes() {
         const container = document.getElementById('app');
         container.innerHTML = actions.map(a => `
             <div class="card" style="border-top-color: ${a.sentiment === 'colère' ? 'var(--danger)' : 'var(--primary)'}">
-                ${a.sentiment === 'colère' ? `<div class="alert-badge">⚠️ Client Mécontent</div>` : ''}
+                ${a.urgent ? `<div class="alert-badge">⚠️ Action Requise</div>` : ''}
                 <div class="client-header">
                     <div class="client-info">
                         <div class="client-avatar">${a.client.split(' ').map(n=>n[0]).join('')}</div>
@@ -121,8 +203,10 @@
                 <div class="suggest-box"><i class="fas fa-robot"></i> ${a.suggest}</div>
                 <div class="btn-grid">
                     <button class="btn btn-val" onclick="validate(${a.id})">Valider</button>
-                    <button class="btn btn-wa" onclick="sendWA('${a.phone}', '${a.suggest}')">WhatsApp</button>
-                    <button class="btn btn-vtc" onclick="alert('VTC commandé pour ${a.client} !')"><i class="fas fa-car"></i></button>
+                    <button class="btn btn-wa" onclick="sendWA('${a.phone}', '${a.suggest}')">WA</button>
+                    ${a.review ? `<button class="btn btn-review" onclick="alert('Review envoyée')">Note</button>` : `<button class="btn btn-vtc" onclick="alert('VTC commandé')">VTC</button>`}
+                    <button class="btn btn-cleaning" onclick="alert('Checklist envoyée')">Checklist</button>
+                    <button class="btn btn-voice"><i class="fas fa-microphone"></i></button>
                 </div>
             </div>
         `).join('');
@@ -137,8 +221,17 @@
         element.classList.add('active');
         document.getElementById('page-title').innerText = element.innerText;
     }
+    function validate(id) { 
+        alert("Ménage validé ! Stock déduit (-1 kit, -2 café).");
+        stock.cafe -= 2; stock.kits -= 1;
+        document.getElementById('stock-cafe').innerText = stock.cafe;
+        document.getElementById('stock-kits').innerText = stock.kits;
+        const idx = actions.findIndex(x => x.id === id);
+        actions.splice(idx, 1);
+        renderDemandes();
+    }
 
-    renderDemandes();
+    renderBiens(); renderDemandes();
 </script>
 </body>
 </html>
