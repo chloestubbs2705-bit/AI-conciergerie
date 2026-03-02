@@ -3,28 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conciergerie IA - Ultimate Edition</title>
+    <title>Conciergerie IA - Gestion Agenda</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
             --primary: #6366f1; --success: #22c55e; --warning: #f59e0b; --danger: #ef4444;
-            --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --muted: #64748b; --vip: #8b5cf6;
+            --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --muted: #64748b; --calendar: #475569;
         }
-        .dark-mode {
-            --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --muted: #94a3b8;
-        }
+        .dark-mode { --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --muted: #94a3b8; }
 
         * { box-sizing: border-box; margin: 0; padding: 0; transition: all 0.2s; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 30px; }
         
-        header { 
-            background: var(--primary); color: white; padding: 15px; 
-            display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 100;
-        }
+        header { background: var(--primary); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
 
         .search-container { background: var(--card); padding: 10px 15px; border-bottom: 1px solid #ddd; }
-        .search-bar { width: 100%; padding: 12px; border-radius: 25px; border: 1px solid #ddd; background: var(--bg); color: var(--text); font-size: 0.9rem; }
+        .search-bar { width: 100%; padding: 12px; border-radius: 25px; border: 1px solid #ddd; background: var(--bg); color: var(--text); }
 
         .nav-tabs { display: flex; background: var(--card); border-bottom: 1px solid #ddd; position: sticky; top: 55px; z-index: 90; }
         .tab { flex: 1; text-align: center; padding: 12px 5px; cursor: pointer; font-size: 0.75rem; font-weight: 600; color: var(--muted); border-bottom: 3px solid transparent; }
@@ -35,14 +29,9 @@
         .card { 
             background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 15px;
             box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-left: 6px solid var(--primary);
-            position: relative; overflow: hidden;
         }
 
-        .memory-badge {
-            background: #fef3c7; color: #92400e; padding: 10px; border-radius: 12px;
-            font-size: 0.85rem; margin-top: 10px; border: 1px dashed #f59e0b;
-            display: flex; align-items: center; gap: 8px;
-        }
+        .memory-badge { background: #fef3c7; color: #92400e; padding: 10px; border-radius: 12px; font-size: 0.85rem; margin-top: 10px; border: 1px dashed #f59e0b; display: flex; align-items: center; gap: 8px; }
 
         .status-pill { font-size: 0.65rem; padding: 4px 10px; border-radius: 20px; font-weight: bold; text-transform: uppercase; }
         .check-in { background: #dcfce7; color: #166534; }
@@ -50,11 +39,14 @@
 
         .msg-box { background: rgba(0,0,0,0.03); padding: 12px; border-radius: 8px; margin: 12px 0; border-left: 3px solid #cbd5e1; font-style: italic; font-size: 0.9rem; }
         
-        .button-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 15px; }
-        .btn { border: none; padding: 12px 5px; border-radius: 12px; font-weight: 600; cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; gap: 5px; }
-        .btn-val { background: var(--success); color: white; grid-column: span 3; flex-direction: row; justify-content: center; font-size: 0.95rem; margin-bottom: 5px; }
+        /* Grille de boutons mise à jour pour l'Agenda */
+        .button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
+        .btn { border: none; padding: 10px 5px; border-radius: 12px; font-weight: 600; cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; gap: 5px; }
+        
+        .btn-val { background: var(--success); color: white; grid-column: span 2; flex-direction: row; justify-content: center; font-size: 0.95rem; }
         .btn-wa { background: #25D366; color: white; }
         .btn-call { background: #3b82f6; color: white; }
+        .btn-cal { background: var(--calendar); color: white; }
         .btn-mod { background: var(--warning); color: white; }
 
         #modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
@@ -66,7 +58,7 @@
 
 <header>
     <div><i class="fas fa-robot"></i> <strong>Concierge IA Pro</strong></div>
-    <button onclick="document.body.classList.toggle('dark-mode')" style="background:none; border:none; color:white; font-size:1.2rem;"><i class="fas fa-adjust"></i></button>
+    <button onclick="document.body.classList.toggle('dark-mode')" style="background:none; border:none; color:white;"><i class="fas fa-adjust"></i></button>
 </header>
 
 <div class="search-container">
@@ -74,17 +66,17 @@
 </div>
 
 <div class="nav-tabs">
-    <div class="tab active" onclick="switchTab('all', this)"><i class="fas fa-border-all"></i><br>Tout</div>
-    <div class="tab" onclick="switchTab('Airbnb', this)"><i class="fab fa-airbnb"></i><br>Airbnb</div>
-    <div class="tab" onclick="switchTab('Booking.com', this)"><i class="fas fa-bed"></i><br>Booking</div>
-    <div class="tab" onclick="switchTab('WhatsApp', this)"><i class="fab fa-whatsapp"></i><br>Direct</div>
+    <div class="tab active" onclick="switchTab('all', this)"><i class="fas fa-border-all"></i> Tout</div>
+    <div class="tab" onclick="switchTab('Airbnb', this)"><i class="fab fa-airbnb"></i> Airbnb</div>
+    <div class="tab" onclick="switchTab('Booking.com', this)"><i class="fas fa-bed"></i> Booking</div>
+    <div class="tab" onclick="switchTab('WhatsApp', this)"><i class="fab fa-whatsapp"></i> Direct</div>
 </div>
 
 <div class="container" id="app"></div>
 
 <div id="modal">
     <div class="modal-content">
-        <h3><i class="fas fa-pen"></i> Modifier la réponse</h3>
+        <h3><i class="fas fa-pen"></i> Modifier</h3>
         <textarea id="edit-text"></textarea>
         <button class="btn btn-val" onclick="saveEdit()">Confirmer</button>
         <button class="btn" style="width:100%; background:none; color:var(--muted)" onclick="closeModal()">Annuler</button>
@@ -96,53 +88,29 @@
     let searchQuery = '';
     let currentEditId = null;
 
-    // Simulation de données avec tes nouvelles fonctionnalités
     const actions = [
-        { id: 1, client: "Mme X", logement: "Villa Vue Mer", source: "Airbnb", type: "check-in", msg: "On arrive à 14h, lit bébé possible ?", suggest: "Prévoir lit bébé pour 14h. Contacter Marie (Ménage).", phone: "33612345678", memory: "Aime les restaurants japonais et le vin blanc." },
-        { id: 2, client: "Marc A.", logement: "Studio Centre", source: "Booking.com", type: "check-out", msg: "Départ fait, merci !", suggest: "Ménage requis Studio Centre immédiatement.", phone: "33698765432", memory: null },
-        { id: 3, client: "Sophie VIP", logement: "Penthouse", source: "WhatsApp", type: "check-in", msg: "Il manque du café.", suggest: "Livrer capsules Nespresso au Penthouse.", phone: "33611223344", memory: "Client VIP - Toujours fournir des fleurs fraîches." }
+        { id: 1, client: "Mme X", logement: "Villa Vue Mer", source: "Airbnb", type: "check-in", msg: "On arrive à 14h, lit bébé possible ?", suggest: "Prévoir lit bébé pour 14h.", phone: "33612345678", memory: "Aime le vin blanc." },
+        { id: 2, client: "Problème Tech", logement: "Studio Centre", source: "WhatsApp", type: "Urgence", msg: "La clim ne marche plus !", suggest: "L'IA ne peut pas réparer la clim. Prends RDV avec le technicien.", phone: "33600000000", memory: null }
     ];
-
-    function filterSearch(val) {
-        searchQuery = val.toLowerCase();
-        render();
-    }
-
-    function switchTab(source, element) {
-        currentTab = source;
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        element.classList.add('active');
-        render();
-    }
 
     function render() {
         const container = document.getElementById('app');
-        const filtered = actions.filter(a => {
-            const matchesTab = currentTab === 'all' || a.source === currentTab;
-            const matchesSearch = a.client.toLowerCase().includes(searchQuery) || a.logement.toLowerCase().includes(searchQuery);
-            return matchesTab && matchesSearch;
-        });
+        const filtered = actions.filter(a => (currentTab === 'all' || a.source === currentTab) && (a.client.toLowerCase().includes(searchQuery) || a.logement.toLowerCase().includes(searchQuery)));
         
         container.innerHTML = filtered.map(a => `
             <div class="card" id="card-${a.id}">
-                <div style="display:flex; justify-content:space-between; align-items:center">
+                <div style="display:flex; justify-content:space-between">
                     <span class="status-pill ${a.type}">${a.type}</span>
-                    <small style="color:var(--primary); font-weight:bold;">${a.source}</small>
+                    <small style="color:var(--primary)">${a.source}</small>
                 </div>
-                <div style="margin: 15px 0 5px 0; font-size:1.1rem;"><strong>${a.client}</strong></div>
-                <div style="color:var(--muted); font-size:0.8rem;"><i class="fas fa-map-marker-alt"></i> ${a.logement}</div>
-                
+                <div style="margin-top:10px;"><strong>${a.client}</strong> - ${a.logement}</div>
                 <div class="msg-box">"${a.msg}"</div>
-
-                ${a.memory ? `<div class="memory-badge"><i class="fas fa-lightbulb"></i> <span><strong>Mémoire :</strong> ${a.memory}</span></div>` : ''}
-                
-                <div style="margin-top:15px; font-size:0.9rem; color:var(--primary); background: #f0f7ff; padding:10px; border-radius:10px; border: 1px solid #e0e7ff;">
-                    <i class="fas fa-robot"></i> ${a.suggest}
-                </div>
+                <div style="font-size:0.9rem; color:var(--primary); background: #f0f7ff; padding:8px; border-radius:8px;"><i class="fas fa-robot"></i> ${a.suggest}</div>
 
                 <div class="button-grid">
                     <button class="btn btn-val" onclick="validate(${a.id})"><i class="fas fa-check-circle"></i> VALIDER</button>
                     <button class="btn btn-wa" onclick="sendWA('${a.phone}', '${a.suggest}')"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                    <button class="btn btn-cal" onclick="addToCalendar('${a.client}', '${a.logement}', '${a.msg}')"><i class="fas fa-calendar-plus"></i> Agenda</button>
                     <button class="btn btn-call" onclick="window.open('tel:${a.phone}')"><i class="fas fa-phone"></i> Appeler</button>
                     <button class="btn btn-mod" onclick="openModal(${a.id}, '${a.suggest}')"><i class="fas fa-edit"></i> Modifier</button>
                 </div>
@@ -150,24 +118,21 @@
         `).join('');
     }
 
+    function addToCalendar(client, log, msg) {
+        const title = encodeURIComponent(`Action Concierge : ${client} (${log})`);
+        const details = encodeURIComponent(`Message client : ${msg}`);
+        // Lien vers Google Calendar
+        const url = `https://www.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}`;
+        window.open(url, '_blank');
+    }
+
+    function filterSearch(val) { searchQuery = val.toLowerCase(); render(); }
+    function switchTab(s, e) { currentTab = s; document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); e.classList.add('active'); render(); }
     function sendWA(p, t) { window.open(`https://wa.me/${p}?text=${encodeURIComponent(t)}`, '_blank'); }
     function openModal(id, text) { currentEditId = id; document.getElementById('edit-text').value = text; document.getElementById('modal').style.display = 'flex'; }
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
-    function saveEdit() { 
-        const action = actions.find(a => a.id === currentEditId);
-        action.suggest = document.getElementById('edit-text').value;
-        validate(currentEditId);
-        closeModal();
-    }
-    function validate(id) {
-        const el = document.getElementById(`card-${id}`);
-        el.style.transform = "translateX(100%)"; el.style.opacity = "0";
-        setTimeout(() => { 
-            const idx = actions.findIndex(a => a.id === id);
-            actions.splice(idx, 1);
-            render();
-        }, 300);
-    }
+    function saveEdit() { const a = actions.find(x => x.id === currentEditId); a.suggest = document.getElementById('edit-text').value; validate(currentEditId); closeModal(); }
+    function validate(id) { const el = document.getElementById(`card-${id}`); el.style.opacity = "0"; setTimeout(() => { actions.splice(actions.findIndex(x => x.id === id), 1); render(); }, 300); }
 
     render();
 </script>
