@@ -41,8 +41,6 @@
         .client-avatar { width: 40px; height: 40px; background: var(--bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--primary); }
         
         .msg-box { background: var(--bg); padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 0.85rem; font-style: italic; }
-        .photos-preview { display: flex; gap: 10px; margin-top: 10px; }
-        .photo-thumb { width: 60px; height: 60px; background: #ddd; border-radius: 8px; background-size: cover; }
 
         .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
         .btn { border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; text-align: center; font-size: 0.85rem; }
@@ -50,6 +48,13 @@
         .btn-wa { background: #25D366; color: white; }
         .btn-voice { background: var(--muted); color: white; }
 
+        /* Tables & Map */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: var(--card); border-radius: 8px; overflow: hidden; }
+        th, td { text-align: left; padding: 15px; border-bottom: 1px solid #eee; }
+        th { background: #f8fafc; color: var(--muted); font-size: 0.8rem; }
+        
+        .map-box { height: 300px; background: #e0e7ff; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--primary); font-weight: bold; margin-bottom: 20px; border: 2px dashed var(--primary); }
+        
         /* Contenu caché par défaut */
         .page-content { display: none; }
         .page-content.active { display: block; }
@@ -60,6 +65,7 @@
 <div class="sidebar">
     <h2><i class="fas fa-concierge-bell"></i> Elite Concierge</h2>
     <div class="nav-item active" onclick="switchPage('dashboard', this)"><i class="fas fa-home"></i> Dashboard</div>
+    <div class="nav-item" onclick="switchPage('biens', this)"><i class="fas fa-map-marked-alt"></i> Biens & Carte</div>
     <div class="nav-item" onclick="switchPage('planning', this)"><i class="fas fa-calendar-alt"></i> Planning</div>
     <div class="nav-item" onclick="switchPage('demandes', this)"><i class="fas fa-list-ul"></i> Demandes</div>
     <div class="nav-item" onclick="switchPage('stocks', this)"><i class="fas fa-boxes"></i> Stocks</div>
@@ -77,85 +83,96 @@
             <div class="kpi-card"><div class="kpi-title">Taux d'Occupation</div><div class="kpi-value">85%</div></div>
             <div class="kpi-card"><div class="kpi-title">Alertes Stock</div><div class="kpi-value" style="color:var(--danger)">Café / Draps</div></div>
         </div>
+        <div class="grid-container" id="app"></div>
+    </div>
 
-        <div class="grid-container" id="app">
-            </div>
+    <div id="biens" class="page-content">
+        <div class="map-box"><i class="fas fa-map-marker-alt fa-2x"></i>&nbsp; Carte Interactive des Biens (Cannes)</div>
+        <div class="kpi-card">
+            <h3>Liste des Biens</h3>
+            <table>
+                <thead><tr><th>Nom</th><th>Adresse</th><th>Status</th></tr></thead>
+                <tbody>
+                    <tr><td>Villa Vue Mer</td><td>12 Av. des Fleurs, Cannes</td><td style="color:var(--success)">Disponible</td></tr>
+                    <tr><td>Studio Centre</td><td>5 Rue du Port, Cannes</td><td style="color:var(--danger)">Occupé</td></tr>
+                    <tr><td>Penthouse Luxe</td><td>20 Bd de la Croisette, Cannes</td><td style="color:var(--success)">Disponible</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <div id="planning" class="page-content">
-        <div class="kpi-card"><h3>Calendrier Général</h3><p style="margin-top:20px; color:var(--muted)">Vue planning en cours de développement...</p></div>
+        <div class="kpi-card">
+            <h3>Planning Hebdomadaire</h3>
+            <table>
+                <thead><tr><th>Bien</th><th>Client</th><th>Check-in</th><th>Check-out</th></tr></thead>
+                <tbody>
+                    <tr><td>Villa Vue Mer</td><td>H. Müller</td><td>03/03/26</td><td>10/03/26</td></tr>
+                    <tr><td>Studio Centre</td><td>S. L.</td><td>01/03/26</td><td>05/03/26</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="demandes" class="page-content">
+        <div class="grid-container" id="app-demandes"></div>
     </div>
 
     <div id="stocks" class="page-content">
-        <div class="kpi-card"><h3>Inventaire en temps réel</h3><p style="margin-top:20px; color:var(--muted)">Gestion des stocks en cours de développement...</p></div>
+        <div class="kpi-card">
+            <h3>Inventaire</h3>
+            <table>
+                <thead><tr><th>Article</th><th>Quantité</th><th>Seuil Alerte</th></tr></thead>
+                <tbody>
+                    <tr><td>Capsules Café</td><td style="color:var(--danger)">12</td><td>50</td></tr>
+                    <tr><td>Kits Accueil</td><td>30</td><td>20</td></tr>
+                    <tr><td>Draps Doubles</td><td style="color:var(--danger)">8</td><td>15</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
 <script>
     // 1. Logique des pages (Sidebar)
     function switchPage(pageId, element) {
-        // Cacher toutes les pages
         document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
-        // Désactiver tous les items du menu
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        
-        // Afficher la page cliquée
         document.getElementById(pageId).classList.add('active');
-        // Activer le menu cliqué
         element.classList.add('active');
-        // Mettre à jour le titre
         document.getElementById('page-title').innerText = element.innerText;
     }
 
-    // 2. Logique du flux (Cartes)
+    // 2. Données pour les Demandes
     const actions = [
-        { id: 1, client: "Hans Müller", log: "Villa Cannes", source: "Airbnb", type: "check-in", lang: "DE", msg: "Können wir um 13 Uhr einchecken?", trans: "Pouvons-nous arriver à 13h ?", suggest: "Accorder arrivée anticipée (Ménage OK).", phone: "33612345678", urgent: true, photos: ['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=50&w=100'] },
-        { id: 2, client: "Sophie L.", log: "Studio Nice", source: "Booking.com", type: "upsell", lang: "FR", msg: "Possibilité d'avoir du champagne ?", trans: null, suggest: "Pack Romance 45€.", phone: "33600000000", urgent: false, photos: [] }
+        { id: 1, client: "Hans Müller", log: "Villa Cannes", source: "Airbnb", type: "check-in", lang: "DE", msg: "Arrivée 13h ?", phone: "33612345678", suggest: "Ok 13h.", urgent: true },
+        { id: 2, client: "Sophie L.", log: "Studio Nice", source: "Booking.com", type: "upsell", lang: "FR", msg: "Champagne ?", phone: "33600000000", suggest: "Pack Romance 45€.", urgent: false },
+        { id: 3, client: "John Doe", log: "Penthouse", source: "WhatsApp", type: "check-out", lang: "EN", msg: "Perfect!", phone: "33611223344", suggest: "Relancer review.", urgent: false }
     ];
 
-    function render() {
-        const container = document.getElementById('app');
+    function renderDemandes(containerId) {
+        const container = document.getElementById(containerId);
         container.innerHTML = actions.map(a => `
             <div class="card" style="border-top-color: ${a.urgent ? 'var(--danger)' : 'var(--primary)'}">
                 <div class="client-header">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <div class="client-avatar">${a.client.split(' ').map(n=>n[0]).join('')}</div>
-                        <div><strong>${a.client}</strong><br><small style="color:var(--muted)">${a.log}</small></div>
-                    </div>
+                    <strong>${a.client}</strong>
                     <span class="client-avatar" style="font-size:0.7rem; background:#e0e7ff; color:var(--primary);">${a.lang}</span>
                 </div>
-                
-                <div class="msg-box">
-                    "${a.msg}"
-                    ${a.trans ? `<div style="font-size:0.75rem; color:var(--muted); margin-top:5px; border-top:1px solid #ddd; padding-top:5px;">${a.trans}</div>` : ''}
-                </div>
-
-                <div style="font-size:0.85rem; color:var(--primary); background: #e0e7ff; padding:8px; border-radius:6px; font-weight:bold;">
-                    <i class="fas fa-robot"></i> ${a.suggest}
-                </div>
-
+                <div class="msg-box">"${a.msg}"</div>
+                <div style="font-size:0.85rem; color:var(--primary); background: #e0e7ff; padding:8px; border-radius:6px;">${a.suggest}</div>
                 <div class="btn-grid">
-                    <button class="btn btn-val" onclick="validate(${a.id})"><i class="fas fa-check"></i> Valider</button>
-                    <button class="btn btn-wa" onclick="sendWA('${a.phone}', '${a.suggest}')"><i class="fab fa-whatsapp"></i> Répondre</button>
-                    <button class="btn btn-voice"><i class="fas fa-microphone"></i> Dictée</button>
+                    <button class="btn btn-val" onclick="validate(${a.id})">Valider</button>
+                    <button class="btn btn-wa" onclick="sendWA('${a.phone}', '${a.suggest}')">WhatsApp</button>
                 </div>
             </div>
         `).join('');
     }
 
-    // Fonction WhatsApp opérationnelle
-    function sendWA(phone, message) {
-        const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-        window.open(url, '_blank');
-    }
+    function sendWA(phone, message) { window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank'); }
+    function validate(id) { alert("Action validée !"); const idx = actions.findIndex(x => x.id === id); actions.splice(idx, 1); renderAll(); }
+    function renderAll() { renderDemandes('app'); renderDemandes('app-demandes'); }
 
-    function validate(id) {
-        const idx = actions.findIndex(x => x.id === id);
-        actions.splice(idx, 1);
-        render();
-    }
-
-    render();
+    renderAll();
 </script>
 </body>
 </html>
